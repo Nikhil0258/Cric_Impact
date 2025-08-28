@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block title %}Match Details - CricImpact{% endblock %}
+
+{% block content %}
+<h2>Match Detail</h2>
+
+<div class="match-grid">
+    <div class="match-card">
+        <h3>{{ match.team1 }} vs {{ match.team2 }}</h3>
+        <p><strong>Score:</strong> {{ match.score }}</p>
+        <p><strong>Status:</strong> <span style="color: {{ match.status_color }}">{{ match.status }}</span></p>
+        <p><strong>Series:</strong> {{ match.series }}</p>
+        <p><strong>Venue:</strong> {{ match.venue }}</p>
+        <p><strong>Date:</strong> {{ match.date }}</p>
+        <p><strong>Toss:</strong> {{ match.toss }}</p>
+        <p><strong>Winner:</strong> {{ match.winner }}</p>
+    </div>
+</div>
+
+{% if impact_data %}
+<h3>Player Impact Summary</h3>
+<div class="match-grid">
+    {% for player in impact_data %}
+    <div class="match-card">
+        <h4>{{ player.name }}</h4>
+        <p><strong>Team:</strong> {{ player.team }}</p>
+        <p><strong>Impact:</strong> {{ player.impact_score }}%</p>
+        <p><strong>Role:</strong> {{ player.role }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

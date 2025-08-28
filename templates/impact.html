@@ -1,0 +1,221 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2 class="mb-3">Top Impact Players</h2>
+
+<!-- Live match chooser -->
+<div class="card p-3 mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <strong>Select a live match</strong>
+    {% if active_match_id %}
+      <span class="text-muted small">Selected: <code>{{ active_match_id }}</code></span>
+    {% endif %}
+  </div>
+
+  {% if live_matches and live_matches|length %}
+    <div class="match-chooser">
+      {% for m in live_matches %}
+        <a class="match-chip {{ 'active' if active_match_id == m.id else '' }}"
+           href="{{ url_for('show_impact_match', match_id=m.id) }}"
+           title="{{ m.name }}">
+          {{ m.name or 'Match' }}
+          {% set st = (m.status or '')|lower %}
+          {% if 'live' in st or 'progress' in st %}
+            <span class="live-dot" aria-label="Live"> ⬤</span>
+          {% endif %}
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-secondary m-0">
+      No live matches right now. You can still browse saved matches or try again later.
+    </div>
+  {% endif %}
+</div>
+
+<!-- Legend -->
+<div class="legend card mb-4 p-3">
+  <strong>Legend:</strong>
+  <span class="ms-2 me-3">▲ above team avg</span>
+  <span class="me-3">▼ below team avg</span>
+  <span class="me-3">▬ near team avg</span>
+  <span class="badge tier-elite">Elite ≥110</span>
+  <span class="badge tier-high">High 80–109</span>
+  <span class="badge tier-solid">Solid 50–79</span>
+  <span class="badge tier-developing">Developing &lt;50</span>
+</div>
+
+{% if impact_summary and impact_summary.count %}
+<p class="text-muted">
+  Global Avg Impact: <strong>{{ "%.2f"|format(impact_summary.global_avg) }}%</strong>
+</p>
+{% endif %}
+
+<div class="impact-grid">
+  {% for p in impact_players %}
+    <div class="impact-card tier-{{ p.tier }}">
+      <h3 class="mb-1">{{ p.name }}</h3>
+      <div class="text-muted mb-2">{{ p.team }}</div>
+
+      <div class="mb-1">
+        <strong>Impact:</strong>
+        <span class="badge big">{{ "%.2f"|format(p.impact_score) }}%</span>
+        <span class="delta {{ 'up' if p.symbol=='▲' else ('down' if p.symbol=='▼' else 'flat') }}">
+          {{ p.symbol }} {{ '%+.1f'|format(p.pct_vs_team) }}% vs team avg
+        </span>
+      </div>
+
+      <div class="small text-muted mb-1">
+        Bat: {{ "%.1f"|format(p.bat_impact) }} &nbsp;|&nbsp;
+        Bowl: {{ "%.1f"|format(p.bowl_impact) }}
+      </div>
+
+      <div class="small"><em>Role: {{ p.role }}</em></div>
+    </div>
+  {% else %}
+    <div class="alert alert-info">
+      {% if active_match_id and impact_note %}
+        {{ impact_note }}
+      {% else %}
+        No impact to show yet. Pick a live match above to calculate impact.
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>
+
+<!-- ===== Floating "How it works" card (bottom-right, sticky) ===== -->
+<div id="impact-help" class="impact-help" role="complementary" aria-label="How Impact is calculated" data-state="open">
+  <div class="help-header">
+    <strong>How Impact is calculated</strong>
+    <button id="impact-help-toggle" class="help-toggle" aria-expanded="true" aria-controls="impact-help-body" title="Minimize">—</button>
+  </div>
+  <div id="impact-help-body" class="help-body">
+    <p class="mb-2">Each player's <em>Total Impact</em> is the sum of batting and bowling impact for the selected match.</p>
+
+    <div class="help-section">
+      <div class="help-title">Batting Impact</div>
+      <ul>
+        <li>Strike Rate = <code>(runs ÷ balls) × 100</code></li>
+        <li><strong>Bat Impact</strong> = <code>runs × 0.4 + strike_rate × 0.6</code></li>
+      </ul>
+    </div>
+
+    <div class="help-section">
+      <div class="help-title">Bowling Impact</div>
+      <ul>
+        <li>Overs like <code>4.3</code> mean 4 overs &amp; 3 balls → <code>4 + 3/6 = 4.5</code></li>
+        <li><strong>Bowl Impact</strong> = <code>wickets × 8 + (10 − overs_bowled)</code></li>
+      </ul>
+    </div>
+
+    <div class="help-section">
+      <div class="help-title">Total &amp; Badges</div>
+      <ul>
+        <li><strong>Total Impact</strong> = <code>Bat Impact + Bowl Impact</code></li>
+        <li>Symbol vs team avg: <span class="sym up">▲</span> above, <span class="sym down">▼</span> below, <span class="sym flat">▬</span> near (±3)</li>
+        <li>Tiers: <span class="badge tier-elite">Elite ≥110</span> <span class="badge tier-high">High 80–109</span> <span class="badge tier-solid">Solid 50–79</span> <span class="badge tier-developing">Developing &lt;50</span></li>
+      </ul>
+    </div>
+
+    <div class="help-section">
+      <div class="help-title">Example</div>
+      <p class="mb-1 small">
+        Batter: 60 (40) ⇒ SR=150 → Bat= <code>60×0.4 + 150×0.6 = 114</code><br>
+        Bowler: 2 wickets, 4.3 ov (4.5) → Bowl= <code>2×8 + (10−4.5) = 19.5</code><br>
+        <strong>Total Impact = 133.5</strong>
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+/* existing styles */
+.match-chooser { display: flex; flex-wrap: wrap; gap: .5rem; }
+.match-chip {
+  display: inline-block; padding: .4rem .7rem; border-radius: 999px;
+  background: #f1f3f5; text-decoration: none; color: #222; border: 1px solid #e9ecef;
+}
+.match-chip:hover { background: #e9ecef; }
+.match-chip.active { background: #2f80ed; color: #fff; border-color: #2f80ed; }
+.live-dot { color: red; margin-left: .35rem; font-weight: 700; }
+
+.impact-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.impact-card {
+  background: #fff; border-radius: 14px; padding: 1rem 1.2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 6px solid #e9ecef;
+}
+.badge { border-radius: 999px; background: #f1f3f5; padding: .2rem .55rem; }
+.badge.big { font-size: 0.95rem; }
+.delta.up { color: #1b7e2d; font-weight: 600; }
+.delta.down { color: #c0392b; font-weight: 600; }
+.delta.flat { color: #6c757d; font-weight: 600; }
+
+.tier-elite { border-left-color: #2f80ed; }
+.tier-high { border-left-color: #27ae60; }
+.tier-solid { border-left-color: #f2c94c; }
+.tier-developing { border-left-color: #e67e22; }
+.legend .badge { margin-right: .4rem; }
+
+/* ===== Floating help card ===== */
+.impact-help {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: min(360px, 92vw);
+  max-height: 72vh;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  z-index: 1000;
+  overflow: hidden;
+}
+.help-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .6rem .8rem; background: #f8f9fa; border-bottom: 1px solid #e9ecef;
+}
+.help-toggle {
+  border: 0; background: transparent; font-size: 1.2rem; line-height: 1;
+  cursor: pointer; padding: .2rem .4rem; border-radius: 8px;
+}
+.help-toggle:hover { background: #e9ecef; }
+.help-body { padding: .75rem .9rem; overflow: auto; max-height: calc(72vh - 42px); }
+.help-section { margin-bottom: .6rem; }
+.help-title { font-weight: 600; margin-bottom: .25rem; }
+.sym.up   { color: #1b7e2d; font-weight: 700; }
+.sym.down { color: #c0392b; font-weight: 700; }
+.sym.flat { color: #6c757d; font-weight: 700; }
+
+/* collapsed state */
+.impact-help[data-state="closed"] .help-body { display: none; }
+.impact-help[data-state="closed"] { width: auto; }
+.impact-help[data-state="closed"] .help-header strong { display: none; }
+.impact-help[data-state="closed"] .help-toggle { font-weight: 700; }
+</style>
+
+<script>
+(function () {
+  const box = document.getElementById('impact-help');
+  const btn = document.getElementById('impact-help-toggle');
+  if (!box || !btn) return;
+
+  function update(state) {
+    box.setAttribute('data-state', state);
+    btn.setAttribute('aria-expanded', state === 'open' ? 'true' : 'false');
+    btn.textContent = state === 'open' ? '—' : '?'; // — = minimize, ? = open
+    btn.title = state === 'open' ? 'Minimize' : 'Open';
+  }
+
+  btn.addEventListener('click', function () {
+    const isOpen = box.getAttribute('data-state') !== 'closed';
+    update(isOpen ? 'closed' : 'open');
+  });
+
+  // Start open by default; you can flip to 'closed' if you prefer.
+  update('open');
+})();
+</script>
+{% endblock %}

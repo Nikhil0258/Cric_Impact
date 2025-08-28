@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block title %}{{ match.name }} - Live Detail{% endblock %}
+
+{% block content %}
+<h2>{{ match.name }}</h2>
+
+<p><strong>Status:</strong> {{ match.status }}</p>
+<p><strong>Teams:</strong> {{ match.teams | join(' vs ') }}</p>
+<p><strong>Venue:</strong> {{ match.venue }}</p>
+<p><strong>Date:</strong> {{ match.date }}</p>
+
+<!-- Toss (comes from match_info) -->
+<p><strong>Toss:</strong>
+  {% if match.tossWinner and match.tossDecision %}
+    {{ match.tossWinner }} won the toss and opted to {{ match.tossDecision }}
+  {% else %}
+    Not available from API
+  {% endif %}
+</p>
+
+{% if match.dlApplied %}
+  <p><strong>DLS Applied:</strong> Yes</p>
+{% endif %}
+
+<h3>Score:</h3>
+<ul>
+  {% if match.score and match.score | length > 0 %}
+    {% for inning in match.score %}
+    <li>
+      <strong>{{ inning.inning }}</strong>:
+      {{ inning.r }}/{{ inning.w }} ({{ inning.o }} overs)
+    </li>
+    {% endfor %}
+  {% else %}
+    <li>No scorecard data available</li>
+  {% endif %}
+</ul>
+
+{% endblock %}

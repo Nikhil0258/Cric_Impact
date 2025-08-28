@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+
+{% block title %}Home - CricImpact{% endblock %}
+
+{% block content %}
+
+<h1>Welcome to CricImpact!</h1>
+
+<!-- Live Matches Section -->
+<h2>Live Matches</h2>
+<div class="match-grid">
+  {% for match in live_matches %}
+  <div class="match-card">
+    <h3>
+      <a href="{{ url_for('show_live_match_detail', match_id=match.id) }}">
+        {{ match.name }}
+      </a>
+      {% if match.status|lower == 'live' %}
+        <span class="live-dot" style="color: red;"> ⬤ LIVE</span>
+      {% endif %}
+    </h3>
+    <p><strong>{{ match.venue }}</strong></p>
+    <p><strong>{{ match.date }}</strong></p>
+    <p style="color: green;">{{ match.status }}</p>
+  </div>
+  {% endfor %}
+</div>
+<p><a href="{{ url_for('show_live_matches') }}">Tap to see more</a></p>
+<p><a href="{{ url_for('show_matches') }}">Tap to see more</a></p>
+
+<hr>
+
+<!-- Trending Series, News, and Player Highlights Side-by-Side -->
+<div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 2rem;">
+
+  <!-- Trending Series -->
+  <div style="flex: 1; min-width: 250px;">
+    <h2>Trending Series</h2>
+    <ul>
+      {% for series in trending_series %}
+      <li><a href="#">{{ series.name }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- News -->
+  <div style="flex: 1; min-width: 250px;">
+    <h2>News</h2>
+    <ul>
+      {% for news in trending_news %}
+      <li><a href="#">{{ news.title }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- Recognized Players Today -->
+  <div style="flex: 2; min-width: 300px;">
+    <h2>Recognized Players Today</h2>
+    <div class="match-grid">
+      {% for player in highlight_players %}
+      <div class="match-card">
+        <h4>{{ player.name }}</h4>
+        <p>{{ player.reason }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- Viral News -->
+<h2>Viral News</h2>
+<div class="match-grid">
+  {% for news in viral_news %}
+  <div class="match-card">
+    <h4>{{ news.title }}</h4>
+    <p>{{ news.summary }}</p>
+  </div>
+  {% endfor %}
+</div>
+
+<hr>
+
+<!-- Impact Explanation Section -->
+<h2>Impact Feature Explanation</h2>
+<div class="match-card">
+  <p>The CricImpact system calculates impact based on individual player performances, adjusting for match situation, opposition strength, and game context.</p>
+  <a href="{{ url_for('show_impact') }}">Learn more about Player Impact</a>
+</div>
+
+{% endblock %}

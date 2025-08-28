@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block title %}Rankings - CricImpact{% endblock %}
+
+{% block content %}
+<h2>Player Rankings</h2>
+
+<h3>Top Batters</h3>
+<ol>
+  {% for player in batters[:5] %}
+  <li>{{ player.name }} - {{ player.batting }} pts</li>
+  {% endfor %}
+</ol>
+
+<h3>Top Bowlers</h3>
+<ol>
+  {% for player in bowlers[:5] %}
+  <li>{{ player.name }} - {{ player.bowling }} pts</li>
+  {% endfor %}
+</ol>
+
+<h3>Top All-Rounders</h3>
+<ol>
+  {% for player in all_rounders[:5] %}
+  <li>{{ player.name }} - {{ player.total }} pts</li>
+  {% endfor %}
+</ol>
+{% endblock %}

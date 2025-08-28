@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block title %}Live Matches - CricImpact{% endblock %}
+
+{% block content %}
+<h2>Live Matches (via API)</h2>
+
+{% if matches %}
+<div class="match-grid">
+    {% for match in matches %}
+    <h3>
+        <a href="{{ url_for('show_live_match_detail', match_id=match.id) }}">
+            {{ match.name }}
+        </a>
+    </h3>
+    <div class="match-card">
+        <h3>{{ match.name }}</h3>
+        <p><strong>Status:</strong> {{ match.status }}</p>
+        <p><strong>Teams:</strong> {{ match.teams | join(' vs ') }}</p>
+        <p><strong>Venue:</strong> {{ match.venue }}</p>
+        <p><strong>Date:</strong> {{ match.date }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No live matches right now.</p>
+{% endif %}
+{% endblock %}

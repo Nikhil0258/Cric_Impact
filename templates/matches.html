@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block title %}Matches - CricImpact{% endblock %}
+
+{% block content %}
+<h2>Current Matches</h2>
+
+<div class="match-grid">
+  {% for match in matches %}
+  <div class="match-card">
+    <h3>
+      <a href="{{ url_for('show_match_detail', match_id=match.id) }}">
+        {{ match.name }}
+      </a>
+      {% if match.status and match.status|lower == 'live' %}
+        <span class="live-dot" style="color:red;"> ⬤ LIVE</span>
+      {% endif %}
+    </h3>
+
+    {% if match.venue %}<p><strong>{{ match.venue }}</strong></p>{% endif %}
+    {% if match.date %}<p><strong>{{ match.date }}</strong></p>{% endif %}
+    {% if match.status %}<p style="color: green;">{{ match.status }}</p>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

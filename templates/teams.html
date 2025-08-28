@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block title %}Teams - CricImpact{% endblock %}
+
+{% block content %}
+<h2>Teams</h2>
+
+<div class="match-grid">
+  {% for team in teams %}
+  <div class="match-card">
+    <img src="{{ team.logo }}" alt="{{ team.name }}" style="width: 80px;">
+    <h3>{{ team.name }}</h3>
+    <a href="#">View Squad</a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

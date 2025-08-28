@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block title %}Players - CricImpact{% endblock %}
+
+{% block content %}
+<h2>All Players</h2>
+
+<div class="match-grid">
+  {% for player in players %}
+  <div class="match-card">
+    <h3>{{ player.name }}</h3>
+    <p><strong>Team:</strong> {{ player.team }}</p>
+    <p><strong>Role:</strong> {{ player.role }}</p>
+    <p><strong>Runs:</strong> {{ player.runs }} ({{ player.balls }} balls)</p>
+    <p><strong>Wickets:</strong> {{ player.wickets }} in {{ player.overs }} overs</p>
+    <p><strong>Total Impact:</strong> {{ player.total_impact }}%</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
