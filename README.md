@@ -23,20 +23,19 @@ CricImpact is a lightweight **Flask** web app that turns live cricket scorecards
 
 ## 🖼️ Screenshots
 
-Add your screenshots here (they’ll appear on your GitHub repo page). You can commit them later.
+> These are stored under `screenshots/` in this repo. Filenames have spaces, so links below use `%20` encoding.
 
-```
-# Recommended folder
-screenshots/impact.png
-```
+**Home**  
+![CricImpact — Home](screenshots/CricImpact%20-%20HomePage.png)
 
-Markdown (already wired here):
+**Impact Page (picker + cards)**  
+![CricImpact — Impact Page](screenshots/CricImpact%20-%20ImpactPage.png)
 
-```md
-![Impact page](screenshots/impact.png)
-```
+**Impact Players (cards & tiers)**  
+![CricImpact — Impact Players](screenshots/CricImpact%20-%20ImpactPlayers.png)
 
----
+**How the Impact is calculated (explainer)**  
+![CricImpact — Impact Calculation](screenshots/CricImpact%20-%20ImpactCalculation.png)
 
 ## 🧱 Tech Stack
 
